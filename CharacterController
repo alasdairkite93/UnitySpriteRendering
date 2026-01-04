@@ -1,0 +1,93 @@
+using UnityEngine;
+
+public class CharacterController : MonoBehaviour
+{
+    public float moveSpeed = 5f; // Speed of the player
+    private Rigidbody2D rb;
+    private Vector2 movement;
+
+    private bool facingRight = true;
+
+    public float flipThreshold = 0.01f;
+
+    public Sprite fronthead;
+    public Sprite headback;
+
+    public Sprite frontbody;
+    public Sprite backbody;
+
+    public SpriteRenderer spriteRendererhead;
+    public SpriteRenderer spriteRendererbody;
+
+    public SpriteRenderer facesprite;
+
+    Animator animator;
+
+    void Awake()
+    {
+       
+    }
+
+    void Start()
+    {
+        rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
+        
+    }
+
+    void Update()
+    {
+        float moveX = rb.linearVelocityX;
+
+        // Get input from arrow keys or WASD
+        movement.x = Input.GetAxisRaw("Horizontal");
+        movement.y = Input.GetAxisRaw("Vertical");
+
+        Debug.Log(movement.y);
+        if (movement.x > 0 && !facingRight)
+        {
+            Flip();
+        }
+
+        else if (movement.y > 0)
+        {
+            spriteRendererhead.sprite = headback;
+            spriteRendererbody.sprite = backbody;
+            facesprite.gameObject.SetActive(false);
+            //animator.SetBool("runningback", true);
+        }
+        else if (movement.x < 0 && facingRight)
+        {
+            Flip();
+        }
+        else if (movement.y < 0 )
+        {
+            spriteRendererhead.sprite = fronthead;
+            spriteRendererbody.sprite = frontbody;
+            facesprite.gameObject.SetActive(true);
+            //animator.SetBool("runningback", false);
+
+        }
+        //else if (movement.y < 0 && facingRight)
+        //{
+        //    spriteRenderer.sprite = fronthead;
+        //    //animator.SetBool("runningback", false);
+
+        //}
+  
+
+    }
+    private void Flip()
+    {
+        facingRight = !facingRight;
+        Vector3 scale = transform.localScale;
+        scale.x *= -1; // Invert X scale
+        transform.localScale = scale;
+    }
+
+    void FixedUpdate()
+    {
+        // Apply movement to Rigidbody
+        rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
+    }
+}
